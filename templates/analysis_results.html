@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analysis Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 20px;
+        }
+
+        h1, h2 {
+            color: #4CAF50;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 12px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        td {
+            background-color: #ffffff;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+        .grand-total {
+        background-color: #002aff !important; 
+        }
+        tbody.custom-color {
+            background-color: #1520e8; 
+        }
+
+        
+    </style>
+</head>
+<body>
+    <h1>Analysis Results for {{ file_name }}</h1>
+    <h3>{{ run_date_time }}</h3>
+
+    {% if analysis_option == 'payer_balance_summary' %}
+        <h2>Payer Balance Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Payer Name</th>
+                    <th>Claim Balance</th>
+                    <th>Unique Claims</th>
+                    <th>Average</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    {% if result['Claim Primary Payer Name'] == 'Grand Total' %}
+                        <tr class="grand-total">
+                            <td>{{ result['Claim Primary Payer Name'] }}</td>
+                            <td>{{ result['Claim Balance'] }}</td>
+                            <td>{{ result['Claim ID'] }}</td>
+                            <td>{{ result['Average'] }}</td>
+                        </tr>
+                    {% else %}
+                        <tr class="custom-color">
+                            <td>{{ result['Claim Primary Payer Name'] }}</td>
+                            <td>{{ result['Claim Balance'] }}</td>
+                            <td>{{ result['Claim ID'] }}</td>
+                            <td>{{ result['Average'] }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif analysis_option == 'aging_summary' %}
+        <h2>Aging Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Aging Bucket</th>
+                    <th>Claim Balance</th>
+                    <th>Unique Claims</th>
+                    <th>Average</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result['Aging Bucket'] }}</td>
+                        <td>{{ result['Claim Balance'] }}</td>
+                        <td>{{ result['Claim ID'] }}</td>
+                        <td>{{ result['Average'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif analysis_option == 'aging_summary_by_payer' %}
+        <h2>Aging Summary by Payer</h2>
+        <p> <br><br>
+            <strong>Payer Name:</strong> Lists the names of different payers.
+            <br>
+            <strong>Total Balance:</strong> Represents the total outstanding balance for each payer.
+            <br>
+            <strong>0-30 Days to 365+ Days:</strong> Displays the balance distribution within specific aging buckets, ranging from 0-30 days to 365+ days. Each entry includes the dollar Amount/Unique Claim Count for that corresponding aging bucket.
+            <br><br>
+
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Payer Name</th>
+                    <th>Total Balance</th>
+                    <th>0-30 Days</th>
+                    <th>30-60 Days</th>
+                    <th>60-90 Days</th>
+                    <th>90-120 Days</th>
+                    <th>120-150 Days</th>
+                    <th>150-180 Days</th>
+                    <th>180-210 Days</th>
+                    <th>210-240 Days</th>
+                    <th>240-270 Days</th>
+                    <th>270-300 Days</th>
+                    <th>300-330 Days</th>
+                    <th>330-365 Days</th>
+                    <th>365+ Days</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result['Claim Primary Payer Name'] }}</td>
+                        <td>{{result['Total Balance']}}</td>
+                        <td>{{ result['0-30'] }}</td>
+                        <td>{{ result['30-60'] }}</td>
+                        <td>{{ result['60-90'] }}</td>
+                        <td>{{ result['90-120'] }}</td>
+                        <td>{{ result['120-150'] }}</td>
+                        <td>{{ result['150-180'] }}</td>
+                        <td>{{ result['180-210'] }}</td>
+                        <td>{{ result['210-240'] }}</td>
+                        <td>{{ result['240-270'] }}</td>
+                        <td>{{ result['270-300'] }}</td>
+                        <td>{{ result['300-330'] }}</td>
+                        <td>{{ result['330-365'] }}</td>
+                        <td>{{ result['365+'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif analysis_option == 'claim_status_summary' %}
+        <h2>Claim Status Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Payer Name</th>
+                    <th>Claim Balance</th>
+                    <th>Top Claim Statuses with Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result['Claim Primary Payer Name'] }}</td>
+                        <td>{{ result['Claim Balance'] }}</td>
+                        <td>
+                            <ul>
+                                {% for status, balance in result['Top Claim Statuses with Balance'].items() %}
+                                    <li>{{ status }}: {{ balance }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif analysis_option == 'balance_bucket' %}
+        <h2>Balance Bucket Report</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Balance Bucket($)</th>
+                    <th>Unique Claims Count</th>
+                    <th>Total Balance</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result['Balance Bucket'] }}</td>
+                        <td>{{ result['Unique Claims Count'] }}</td>
+                        <td>{{ result['Total Balance'] }}</td>
+                        <td>{{ result['Percentage'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Invalid analysis option selected.</p>
+    {% endif %}
+</body>
+</html>

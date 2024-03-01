@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analysis Results </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            margin: 20px;
+        }
+
+        h1, h2 {
+            color: #4CAF50;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 12px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        td {
+            background-color: #ffffff;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Analysis Results for {{ file_name }}</h1>
+
+    {% if analysis_option == 'payer_balance_summary' %}
+        <h2>Payer Balance Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Payer Name</th>
+                    <th>Claim Balance</th>
+                    <th>Unique Claims</th>
+                    <th>Average</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result['Claim Primary Payer Name'] }}</td>
+                        <td>{{ result['Claim Balance'] }}</td>
+                        <td>{{ result['Claim ID'] }}</td>
+                        <td>{{ result['Average'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif analysis_option == 'aging_summary' %}
+        <h2>Aging Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Aging Bucket</th>
+                    <th>Claim Balance</th>
+                    <th>Unique Claims</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result['Aging Bucket'] }}</td>
+                        <td>{{ result['Claim Balance'] }}</td>
+                        <td>{{ result['Claim ID'] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif analysis_option == 'aging_summary_by_payer' %}
+        <h2>Aging Summary by Payer</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Aging Bucket</th>
+                    {% for payer in results[0].keys() %}
+                        {% if payer != 'Aging Bucket' %}
+                            <th>{{ payer }}</th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result['Aging Bucket'] }}</td>
+                        {% for payer, balance in result.items() %}
+                            {% if payer != 'Aging Bucket' %}
+                                <td>{{ balance }}</td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elif analysis_option == 'claim_status_summary' %}
+        <h2>Claim Status Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Payer Name</th>
+                    <th>Claim Balance</th>
+                    <th>Top Claim Statuses with Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result['Claim Primary Payer Name'] }}</td>
+                        <td>{{ result['Claim Balance'] }}</td>
+                        <td>
+                            <ul>
+                                {% for status, balance in result['Top Claim Statuses with Balance'].items() %}
+                                    <li>{{ status }}: {{ balance }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Invalid analysis option selected.</p>
+    {% endif %}
+</body>
+</html>
+.grand-total {
+    background-color: #002aff;
+}
