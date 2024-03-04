@@ -186,6 +186,11 @@ def upload():
 
     return render_template('analysis_options.html', file_path=file_path,file_name=file_name)
 
+
+def testingFunction(file_path):
+    #this is the testing function x
+    df = pd.read_excel(file_path)
+
 @app.route('/analyze', methods=['POST'])
 def analyze():
     file_path = request.form.get('file_path')
